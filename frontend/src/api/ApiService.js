@@ -1,99 +1,154 @@
-import axios from 'axios';
 
-export default class ApiService{
 
-    static API_URL = "http://localhost:8080/api"
+import axios from "axios";
+
+export default class ApiService {
+
+    static API_URL = "http://localhost:8080/api";
+
+    // ================= TOKEN HANDLING =================
 
     static saveToken(token) {
-        localStorage.setItem("token", token)
+        localStorage.setItem("token", token);
     }
 
     static getToken() {
-        return localStorage.getItem("token")
+        return localStorage.getItem("token");
     }
 
     static isAuthenticated() {
-        return !!localStorage.getItem("token")
+        return !!this.getToken();
     }
 
     static logout() {
-        localStorage.removeItem("token")
+        localStorage.removeItem("token");
     }
+
+    // ================= HEADERS =================
 
     static getHeader() {
-        const token = this.getToken()
-        return {
-            Authorization: `Bearer ${token}`,
-            "Content-type": "application/json"
-        }
+        const token = this.getToken();
+
+        return token
+            ? {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+              }
+            : {
+                "Content-Type": "application/json"
+              };
     }
 
-    // Register User
+    // ================= AUTH APIs =================
+
+    // Register
     static async registerUser(body) {
-        const res = await axios.post(`${this.API_URL}/auth/register`, body)
-        return res.data
+        const res = await axios.post(
+            `${this.API_URL}/auth/register`,
+            body,
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+        return res.data;
     }
 
-    // Login User
+    // Login
     static async loginUser(body) {
-        const res = await axios.post(`${this.API_URL}/auth/login`, body)
-        return res.data
+        const res = await axios.post(
+            `${this.API_URL}/auth/login`,
+            body,
+            {
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+        return res.data;
     }
 
-    // Tasks API
+    // ================= TASK APIs =================
+
+    // Create Task
     static async createTask(body) {
-        const res = await axios.post(`${this.API_URL}/tasks`, body, {
-            headers: this.getHeader()
-        })
-        return res.data
+        const res = await axios.post(
+            `${this.API_URL}/tasks`,
+            body,
+            {
+                headers: this.getHeader()
+            }
+        );
+        return res.data;
     }
 
+    // Update Task
     static async updateTask(body) {
-        const res = await axios.put(`${this.API_URL}/tasks`, body, {
-            headers: this.getHeader()
-        })
-        return res.data
+        const res = await axios.put(
+            `${this.API_URL}/tasks`,
+            body,
+            {
+                headers: this.getHeader()
+            }
+        );
+        return res.data;
     }
 
-    static async getAllMyTasks(body) {
-        const res = await axios.get(`${this.API_URL}/tasks`, body, {
-            headers: this.getHeader()
-        })
-        return res.data
+    // Get All Tasks (FIXED)
+    static async getAllMyTasks() {
+        const res = await axios.get(
+            `${this.API_URL}/tasks`,
+            {
+                headers: this.getHeader()
+            }
+        );
+        return res.data;
     }
 
+    // Get Task By ID
     static async getTaskById(taskId) {
-        const res = await axios.get(`${this.API_URL}/tasks/${taskId}`, {
-            headers: this.getHeader()
-        })
-        return res.data
+        const res = await axios.get(
+            `${this.API_URL}/tasks/${taskId}`,
+            {
+                headers: this.getHeader()
+            }
+        );
+        return res.data;
     }
 
+    // Delete Task
     static async deleteTask(taskId) {
-        const res = await axios.delete(`${this.API_URL}/tasks/${taskId}`, {
-            headers: this.getHeader()
-        })
-        return res.data
+        const res = await axios.delete(
+            `${this.API_URL}/tasks/${taskId}`,
+            {
+                headers: this.getHeader()
+            }
+        );
+        return res.data;
     }
 
+    // Get Tasks By Completion Status (FIXED METHOD)
     static async getTasksByCompletionStatus(completed) {
-        const res = await axios.delete(`${this.API_URL}/tasks/status`, {
-            headers: this.getHeader(),
-            params: {
-                completed: completed
+        const res = await axios.get(
+            `${this.API_URL}/tasks/status`,
+            {
+                headers: this.getHeader(),
+                params: { completed }
             }
-        })
-        return res.data
+        );
+        return res.data;
     }
 
+    // Get Tasks By Priority (FIXED METHOD)
     static async getTasksByPriority(priority) {
-        const res = await axios.delete(`${this.API_URL}/tasks/priority`, {
-            headers: this.getHeader(),
-            params: {
-                priority: priority
+        const res = await axios.get(
+            `${this.API_URL}/tasks/priority`,
+            {
+                headers: this.getHeader(),
+                params: { priority }
             }
-        })
-        return res.data
+        );
+        return res.data;
     }
-
 }
